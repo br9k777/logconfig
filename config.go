@@ -37,6 +37,7 @@ func GetLoggerConfigFromFile(pathToConfig string) (*zap.Logger, error) {
 	return logger, nil
 }
 
+// GetDefaultZapConfig - return default zap Config
 func GetDefaultZapConfig() zap.Config {
 	var err error
 	configRaw := []byte(`{
