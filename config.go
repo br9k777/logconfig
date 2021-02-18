@@ -62,8 +62,14 @@ func GetLoggerConfigFromFileWithRotate(pathToConfig string, maxsize, MaxBackups,
 		MaxAge:     MaxAge, // days
 		Compress:   compress,
 	})
+	var encoder zapcore.Encoder
+	if zapConfig.Encoding == "json" {
+		encoder = zapcore.NewJSONEncoder(zapConfig.EncoderConfig)
+	} else {
+		encoder = zapcore.NewConsoleEncoder(zapConfig.EncoderConfig)
+	}
 	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(zapConfig.EncoderConfig),
+		encoder,
 		writeSyncer,
 		zapConfig.Level,
 	)

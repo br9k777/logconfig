@@ -1,0 +1,25 @@
+{
+	"level":"debug",
+	"encoding":"console",
+	"outputPaths": ["/tmp/test.log"],
+	"errorOutputPaths": ["/tmp/test_error.log"],
+	"encoderConfig": {
+		"messageKey": "message",
+		"levelKey": "level",
+		"nameKey": "logger",
+		"timeKey": "time",
+		"callerKey": "logger",
+		"stacktraceKey": "stacktrace",
+		"callstackKey": "callstack",
+		"errorKey": "error",
+		"timeEncoder": "rfc3339",
+		"fileKey": "file",
+		"levelEncoder": "capitalColor",
+		"durationEncoder": "second",
+		"callerEncoder": "full",
+		"sampling": {
+			"initial": "3",
+			"thereafter": "10"
+		}
+	}
+}
