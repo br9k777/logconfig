@@ -9,6 +9,7 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // CustomTimeEncoder function of own formulating time for output to the log
@@ -34,6 +35,45 @@ func GetLoggerConfigFromFile(pathToConfig string) (*zap.Logger, error) {
 	if logger, err = zapConfig.Build(); err != nil {
 		return nil, err
 	}
+	return logger, nil
+}
+
+// GetLoggerConfigFromFileWithRotate - GetLoggerConfigFromFile + log rotate
+func GetLoggerConfigFromFileWithRotate(pathToConfig string, maxsize, MaxBackups, MaxAge int, compress bool) (*zap.Logger, error) {
+	var err error
+	var configRaw []byte
+
+	if configRaw, err = ioutil.ReadFile(pathToConfig); err != nil {
+		return nil, err
+	}
+	zapConfig := zap.Config{}
+	if err = json.Unmarshal(configRaw, &zapConfig); err != nil {
+		return nil, err
+	}
+	zapConfig.EncoderConfig.EncodeTime = CustomTimeEncoder
+
+	if len(zapConfig.OutputPaths) == 0 {
+		return nil, fmt.Errorf("zap config has no output file")
+	}
+	writeSyncer := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   zapConfig.OutputPaths[0],
+		MaxSize:    maxsize, // megabytes
+		MaxBackups: MaxBackups,
+		MaxAge:     MaxAge, // days
+		Compress:   compress,
+	})
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zapConfig.EncoderConfig),
+		writeSyncer,
+		zapConfig.Level,
+	)
+
+	var logger *zap.Logger
+	logger = zap.New(core, zap.AddCaller())
+	//if logger, err = zapConfig.Build(); err != nil {
+	//	return nil, err
+	//}
+
 	return logger, nil
 }
 
@@ -65,7 +105,7 @@ func GetDefaultZapConfig() zap.Config {
 }`)
 	zapConfig := zap.Config{}
 	if err = json.Unmarshal(configRaw, &zapConfig); err != nil {
-		fmt.Fprintf(os.Stderr, "%s", err)
+		_, _ = fmt.Fprintf(os.Stderr, "%s", err)
 		os.Exit(2)
 	}
 	zapConfig.EncoderConfig.EncodeTime = CustomTimeEncoder
