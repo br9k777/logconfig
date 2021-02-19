@@ -75,10 +75,14 @@ func GetLoggerConfigFromFileWithRotate(pathToConfig string, maxsize, MaxBackups,
 	)
 
 	var logger *zap.Logger
-	logger = zap.New(core, zap.AddCaller())
-	//if logger, err = zapConfig.Build(); err != nil {
-	//	return nil, err
-	//}
+	options := make([]zap.Option, 0, 2)
+	if !zapConfig.DisableStacktrace {
+		options = append(options, zap.AddStacktrace(zap.ErrorLevel))
+	}
+	if !zapConfig.DisableCaller {
+		options = append(options, zap.AddCaller())
+	}
+	logger = zap.New(core, options...)
 
 	return logger, nil
 }

@@ -3,6 +3,7 @@
 	"encoding":"console",
 	"outputPaths": ["/tmp/test.log"],
 	"errorOutputPaths": ["/tmp/test_error.log"],
+	"disableCaller": true,
 	"encoderConfig": {
 		"messageKey": "message",
 		"levelKey": "level",
