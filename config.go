@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -22,7 +21,7 @@ func GetLoggerConfigFromFile(pathToConfig string) (*zap.Logger, error) {
 	var err error
 	var configRaw []byte
 
-	if configRaw, err = ioutil.ReadFile(pathToConfig); err != nil {
+	if configRaw, err = os.ReadFile(pathToConfig); err != nil {
 		return nil, err
 	}
 	zapConfig := zap.Config{}
@@ -43,7 +42,7 @@ func GetLoggerConfigFromFileWithRotate(pathToConfig string, maxsize, MaxBackups,
 	var err error
 	var configRaw []byte
 
-	if configRaw, err = ioutil.ReadFile(pathToConfig); err != nil {
+	if configRaw, err = os.ReadFile(pathToConfig); err != nil {
 		return nil, err
 	}
 	zapConfig := zap.Config{}
@@ -122,10 +121,11 @@ func GetDefaultZapConfig() zap.Config {
 	return zapConfig
 }
 
-func GetStandartLogger(loggerType string) (*zap.Logger, error) {
+func GetDefaultLogger(loggerType string) (*zap.Logger, error) {
 	var err error
 	var logger *zap.Logger
-	var config zap.Config = GetDefaultZapConfig()
+	var config zap.Config
+	config = GetDefaultZapConfig()
 	switch loggerType {
 	case "production":
 		config.Level.SetLevel(zapcore.InfoLevel)
